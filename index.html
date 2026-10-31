@@ -489,15 +489,13 @@
 
     <div class="section-title" data-i18n="findTitle">Nhịp điệu báo tìm xe</div>
     <div class="wifi-block">
-      <span data-i18n="findDesc">Bấm "Tìm xe" để thử. Số tiếng bíp (1–10), thời gian mỗi tiếng kêu và thời gian nghỉ giữa hai tiếng (ms).</span>
-      <span data-i18n="findCountLabel">Số tiếng bíp</span>
-      <input id="findN" type="number" min="1" max="10" placeholder="Ví dụ: 4">
-      <span data-i18n="findOnLabel">Thời gian mỗi tiếng kêu (ms, 50–500)</span>
-      <input id="findOn" type="number" min="50" max="500" step="10" placeholder="Ví dụ: 150">
-      <span data-i18n="findOffLabel">Thời gian nghỉ giữa hai tiếng (ms, 50–1000)</span>
-      <input id="findOff" type="number" min="50" max="1000" step="10" placeholder="Ví dụ: 100">
-      <button class="btn btn-add" data-i18n="btnSaveFind" onclick="saveFindRhythm()">Lưu nhịp báo</button>
-      <button class="btn btn-find" data-i18n="btnTestFind" onclick="triggerFindBike()">🔔 Thử nhịp báo</button>
+      <span data-i18n="findPatLabel">Chọn nhịp điệu</span>
+      <select id="findPat" onchange="renderFindPreview()" style="width:100%; padding:10px; border-radius:8px; border:1px solid var(--border); background:var(--input-bg); color:var(--text); font-size:14px;"></select>
+      <div id="findPreview" style="font-size:20px; letter-spacing:3px; text-align:center; color:var(--cyan); min-height:28px; overflow-wrap:anywhere;"></div>
+      <span data-i18n="findRepLabel">Số lần lặp lại (1–10)</span>
+      <input id="findRep" type="number" min="1" max="10" placeholder="Ví dụ: 2">
+      <button class="btn btn-add" data-i18n="btnSaveFind" onclick="saveFindRhythm(false)">Lưu nhịp báo</button>
+      <button class="btn btn-find" data-i18n="btnTestFind" onclick="saveFindRhythm(true)">🔔 Lưu &amp; thử nhịp báo</button>
     </div>
 
     <div class="section-title" data-i18n="holdTitle">Thời gian giữ vân tay để đề</div>
@@ -865,12 +863,10 @@ Object.assign(i18n.vi, {
   holdDesc: "Giữ vân tay lâu hơn số ms này thì đề. Chạm ngắn hơn chỉ tính là chạm để khoá (3 lần chạm = khoá xe), không bao giờ đề. Từ 400 đến 3000.",
   btnSaveHold: "Lưu thời gian giữ",
   findTitle: "Nhịp điệu báo tìm xe",
-  findDesc: "Chỉnh số tiếng bíp (1–10), thời gian mỗi tiếng kêu và thời gian nghỉ giữa hai tiếng (ms). Lưu rồi bấm Thử.",
-  findCountLabel: "Số tiếng bíp",
-  findOnLabel: "Thời gian mỗi tiếng kêu (ms, 50–500)",
-  findOffLabel: "Thời gian nghỉ giữa hai tiếng (ms, 50–1000)",
+  findPatLabel: "Chọn nhịp điệu",
+  findRepLabel: "Số lần lặp lại (1–10)",
   btnSaveFind: "Lưu nhịp báo",
-  btnTestFind: "🔔 Thử nhịp báo",
+  btnTestFind: "🔔 Lưu & thử nhịp báo",
   msgSavedFind: "🔔 Đã lưu nhịp báo tìm xe!",
   msgSavedHold: "👆 Đã lưu thời gian giữ để đề!",
   msgSavedSleep: "😴 Đã lưu cài đặt ngủ nông!",
@@ -909,12 +905,10 @@ Object.assign(i18n.eng, {
   holdDesc: "Hold the fingerprint longer than this many ms to start the engine. Shorter touches only count as lock taps (3 taps = lock) and never start the engine. Range 400 to 3000.",
   btnSaveHold: "Save hold time",
   findTitle: "Find-bike beep rhythm",
-  findDesc: "Set number of beeps (1-10), beep length and gap between beeps (ms). Save, then tap Test.",
-  findCountLabel: "Number of beeps",
-  findOnLabel: "Beep length (ms, 50-500)",
-  findOffLabel: "Gap between beeps (ms, 50-1000)",
+  findPatLabel: "Choose rhythm",
+  findRepLabel: "Repeat count (1-10)",
   btnSaveFind: "Save rhythm",
-  btnTestFind: "🔔 Test rhythm",
+  btnTestFind: "🔔 Save & test rhythm",
   msgSavedFind: "🔔 Find-bike rhythm saved!",
   msgSavedHold: "👆 Hold time saved!",
   msgSavedSleep: "😴 Sleep setting saved!",
@@ -1147,6 +1141,7 @@ function toggleLang() {
   currentLang = currentLang === 'vi' ? 'eng' : 'vi';
   localStorage.setItem('lang', currentLang);
   updateLanguageUI();
+  buildFindSelect();
   if (lastStatus) renderStatus(lastStatus);
   if (cfg) renderConfig(cfg);
 }
@@ -1285,9 +1280,8 @@ function renderConfig(c) {
     document.getElementById('delaySec').value = c.delay || '';
     document.getElementById('starterMs').value = c.starterMs || '';
     document.getElementById('holdMs').value = c.holdMs || '';
-    document.getElementById('findN').value = c.findN || '';
-    document.getElementById('findOn').value = c.findOn || '';
-    document.getElementById('findOff').value = c.findOff || '';
+    if (c.findPat !== undefined) { document.getElementById('findPat').value = String(c.findPat); renderFindPreview(); }
+    document.getElementById('findRep').value = c.findRep || '';
     document.getElementById('sleepSec').value = (c.sleepSec !== undefined) ? c.sleepSec : '';
     document.getElementById('sleepMode').value = (c.sleepMode === 0) ? '0' : '1';
     document.getElementById('odoKmInput').value = c.odo !== undefined ? c.odo : '';
@@ -1377,15 +1371,40 @@ function saveStarterTime() {
   send('starter:' + ms, i18n[currentLang].msgSavedStarter);
 }
 
-function saveFindRhythm() {
-  const n = parseInt(document.getElementById('findN').value, 10);
-  const on = parseInt(document.getElementById('findOn').value, 10);
-  const off = parseInt(document.getElementById('findOff').value, 10);
-  if (isNaN(n) || n < 1 || n > 10 || isNaN(on) || on < 50 || on > 500 || isNaN(off) || off < 50 || off > 1000) {
-    showToast(L('⚠️ Số tiếng 1–10, kêu 50–500 ms, nghỉ 50–1000 ms!', '⚠️ Beeps 1-10, on 50-500 ms, gap 50-1000 ms!'));
+// Thứ tự phải trùng với firmware (FIND_PATTERNS trong .ino)
+const FIND_PATTERNS = [{"vi": "Bíp ngắn", "en": "Short beep", "t": [150]}, {"vi": "Bíp bíp", "en": "Double beep", "t": [150, 100, 150]}, {"vi": "Bíp bíp bíp", "en": "Triple beep", "t": [150, 100, 150, 100, 150]}, {"vi": "Bíp dài", "en": "Long beep", "t": [800]}, {"vi": "Dài – ngắn", "en": "Long – short", "t": [600, 150, 150]}, {"vi": "Ngắn – dài", "en": "Short – long", "t": [150, 150, 600]}, {"vi": "Dồn dập", "en": "Rapid burst", "t": [80, 60, 80, 60, 80, 60, 80, 60, 80, 60, 80]}, {"vi": "Chậm đều", "en": "Slow steady", "t": [400, 400, 400, 400, 400]}, {"vi": "SOS", "en": "SOS", "t": [100, 100, 100, 100, 100, 300, 300, 100, 300, 100, 300, 300, 100, 100, 100, 100, 100]}, {"vi": "Cảnh báo kép", "en": "Double alarm", "t": [120, 80, 120, 400, 120, 80, 120]}, {"vi": "Tăng dần", "en": "Rising", "t": [80, 200, 150, 200, 250, 200, 400]}, {"vi": "Giảm dần", "en": "Falling", "t": [400, 200, 250, 200, 150, 200, 80]}, {"vi": "Nhịp tim", "en": "Heartbeat", "t": [120, 100, 200, 500, 120, 100, 200]}, {"vi": "Morse H (····)", "en": "Morse H (····)", "t": [100, 100, 100, 100, 100, 100, 100]}, {"vi": "Morse K (–·–)", "en": "Morse K (–·–)", "t": [300, 100, 100, 100, 300]}, {"vi": "Morse R (·–·)", "en": "Morse R (·–·)", "t": [100, 100, 300, 100, 100]}, {"vi": "Morse V (···–)", "en": "Morse V (···–)", "t": [100, 100, 100, 100, 100, 100, 300]}, {"vi": "Morse B (–···)", "en": "Morse B (–···)", "t": [300, 100, 100, 100, 100, 100, 100]}, {"vi": "Còi hụ: dài dài ngắn ngắn", "en": "Siren: long long short short", "t": [500, 100, 500, 100, 150, 100, 150]}, {"vi": "Lạch cạch", "en": "Rattle", "t": [60, 60, 60, 60, 300, 150, 300]}, {"vi": "Ba nhanh một dài", "en": "Three fast, one long", "t": [80, 70, 80, 70, 80, 150, 600]}, {"vi": "Hai tiếng cách xa", "en": "Two spaced beeps", "t": [150, 900, 150]}, {"vi": "Bốn tiếng đều", "en": "Four even beeps", "t": [150, 100, 150, 100, 150, 100, 150]}, {"vi": "Chậm nhanh xen kẽ", "en": "Slow-fast mix", "t": [400, 200, 100, 100, 400, 200, 100]}];
+
+function buildFindSelect() {
+  const sel = document.getElementById('findPat');
+  if (!sel) return;
+  const cur = sel.value;
+  sel.innerHTML = FIND_PATTERNS.map((p, i) =>
+    `<option value="${i}">${String(i + 1).padStart(2, '0')}. ${currentLang === 'vi' ? p.vi : p.en}</option>`).join('');
+  if (cur !== '') sel.value = cur;
+  renderFindPreview();
+}
+
+function renderFindPreview() {
+  const sel = document.getElementById('findPat');
+  const box = document.getElementById('findPreview');
+  if (!sel || !box) return;
+  const p = FIND_PATTERNS[parseInt(sel.value, 10)];
+  if (!p) { box.innerText = ''; return; }
+  box.innerText = p.t.map((ms, i) => {
+    if (i % 2 === 0) return ms < 200 ? '●' : (ms < 450 ? '▬' : '▬▬▬');
+    return ms < 200 ? '\u2009' : (ms < 450 ? ' ' : '  ');
+  }).join('');
+}
+
+async function saveFindRhythm(thenTest) {
+  const pat = parseInt(document.getElementById('findPat').value, 10);
+  const rep = parseInt(document.getElementById('findRep').value, 10);
+  if (isNaN(pat) || pat < 0 || pat >= FIND_PATTERNS.length || isNaN(rep) || rep < 1 || rep > 10) {
+    showToast(L('⚠️ Chọn nhịp và nhập số lần lặp từ 1 đến 10!', '⚠️ Pick a rhythm and a repeat count from 1 to 10!'));
     return;
   }
-  send('findcfg:' + n + ',' + on + ',' + off, i18n[currentLang].msgSavedFind);
+  const ok = await send('findcfg:' + pat + ',' + rep, i18n[currentLang].msgSavedFind);
+  if (ok && thenTest) triggerFindBike();
 }
 
 function saveHoldTime() {
@@ -1424,6 +1443,7 @@ async function savePin() {
 // ================== KHỞI TẠO ==================
 try { document.getElementById('pinInput').value = localStorage.getItem('savedPin') || ''; } catch (e) {}
 updateLanguageUI();
+buildFindSelect();
 if (!navigator.bluetooth) {
   setConnMsg(L(
     'Trình duyệt này không hỗ trợ Web Bluetooth. iPhone: mở trang bằng Bluefy. Android: dùng Chrome.',
