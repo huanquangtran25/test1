@@ -416,29 +416,6 @@
       <button class="mini-btn" id="langBtn" onclick="toggleLang()">🌐 VI</button>
     </div>
 
-    <!-- TÙY CHỌN 10 CHẾ ĐỘ CÒI & LẶP LẠI (5-50) -->
-    <div class="section-title" data-i18n="findMelodyTitle">Cài đặt còi tìm xe</div>
-    <div class="wifi-block">
-      <span data-i18n="findMelodyDesc">Chọn 1 trong 10 chế độ còi hú</span>
-      <select id="findMelodySelect" style="width:100%; padding:10px; border-radius:8px; border:1px solid var(--border); background:var(--input-bg); color:var(--text); font-size:14px; margin-bottom:8px;">
-        <option value="0">0. Tiêu chuẩn - Dồn dập (Sport)</option>
-        <option value="1">1. Vui nhộn - Tít bíp ngắn</option>
-        <option value="2">2. VIP Cao cấp - Sang trọng</option>
-        <option value="3">3. Còi hú khẩn cấp (Emergency)</option>
-        <option value="4">4. Nhịp đôi dồn dập (Double Fast)</option>
-        <option value="5">5. Tít chậm lôi cuốn (Slow Beep)</option>
-        <option value="6">6. Âm thanh Robot (Robot BEEP)</option>
-        <option value="7">7. Còi lùi ô tô (Reverse Sound)</option>
-        <option value="8">8. Nhịp tim đập (Heartbeat)</option>
-        <option value="9">9. Còi chớp đa tầng (Multi-Tone)</option>
-      </select>
-
-      <span data-i18n="findRepeatDesc">Số lần lặp lại (5 - 50 lần)</span>
-      <input id="findRepeatInput" type="number" min="5" max="50" value="5" placeholder="Ví dụ: 10" style="width:100%; padding:10px; border-radius:8px; border:1px solid var(--border); background:var(--input-bg); color:var(--text); font-size:14px; margin-bottom:8px;">
-
-      <button class="btn btn-add" data-i18n="btnSaveMelody" onclick="saveFindMelodySettings()">Lưu cài đặt còi tìm xe</button>
-    </div>
-
     <div class="section-title" data-i18n="odoConfigTitle">Cập nhật công-tơ-mét</div>
     <div class="wifi-block">
       <span data-i18n="odoDesc">Số KM hiện tại trên đồng hồ xe</span>
@@ -482,6 +459,7 @@
     <div id="fpContainer" class="contact-container" style="margin-top: 8px; margin-bottom: 12px;"></div>
 
     <button class="btn btn-lock" data-i18n="clearFp" onclick="clearFps()">Xoá tất cả vân tay</button>
+    <button class="btn btn-find" data-i18n="btnLedTest" onclick="send('ledtest', i18n[currentLang].msgLedTest)">Thử màu đèn vân tay</button>
 
     <div class="section-title" data-i18n="rfidTitle">Thẻ RFID</div>
     <button class="btn btn-add" data-i18n="addRfid" onclick="send('addrfid', i18n[currentLang].msgAddRfid)">+ Thêm thẻ mới</button>
@@ -501,11 +479,32 @@
       <button class="btn btn-add" data-i18n="btnSaveDelay" onclick="saveDelay()">Lưu thời gian chờ</button>
     </div>
 
+    <!-- THÊM MỚI: Cài đặt thời gian đề nổ (ms) từ 0.5s trở lên -->
     <div class="section-title" data-i18n="starterTimeTitle">Cài đặt thời gian đề nổ</div>
     <div class="wifi-block">
       <span data-i18n="starterTimeDesc">Thời gian kích Relay đề (ms, tối thiểu 500)</span>
       <input id="starterMs" type="number" min="500" step="100" placeholder="Ví dụ: 1500">
       <button class="btn btn-add" data-i18n="btnSaveStarter" onclick="saveStarterTime()">Lưu thời gian đề</button>
+    </div>
+
+    <div class="section-title" data-i18n="findTitle">Nhịp điệu báo tìm xe</div>
+    <div class="wifi-block">
+      <span data-i18n="findDesc">Bấm "Tìm xe" để thử. Số tiếng bíp (1–10), thời gian mỗi tiếng kêu và thời gian nghỉ giữa hai tiếng (ms).</span>
+      <span data-i18n="findCountLabel">Số tiếng bíp</span>
+      <input id="findN" type="number" min="1" max="10" placeholder="Ví dụ: 4">
+      <span data-i18n="findOnLabel">Thời gian mỗi tiếng kêu (ms, 50–500)</span>
+      <input id="findOn" type="number" min="50" max="500" step="10" placeholder="Ví dụ: 150">
+      <span data-i18n="findOffLabel">Thời gian nghỉ giữa hai tiếng (ms, 50–1000)</span>
+      <input id="findOff" type="number" min="50" max="1000" step="10" placeholder="Ví dụ: 100">
+      <button class="btn btn-add" data-i18n="btnSaveFind" onclick="saveFindRhythm()">Lưu nhịp báo</button>
+      <button class="btn btn-find" data-i18n="btnTestFind" onclick="triggerFindBike()">🔔 Thử nhịp báo</button>
+    </div>
+
+    <div class="section-title" data-i18n="holdTitle">Thời gian giữ vân tay để đề</div>
+    <div class="wifi-block">
+      <span data-i18n="holdDesc">Giữ vân tay lâu hơn số ms này thì đề. Chạm ngắn hơn chỉ tính là chạm để khoá (3 lần chạm = khoá xe), không bao giờ đề. Từ 400 đến 3000.</span>
+      <input id="holdMs" type="number" min="400" max="3000" step="100" placeholder="Ví dụ: 800">
+      <button class="btn btn-add" data-i18n="btnSaveHold" onclick="saveHoldTime()">Lưu thời gian giữ</button>
     </div>
 
     <div class="section-title" data-i18n="sleepTitle">Tự động ngủ nông</div>
@@ -681,12 +680,7 @@ const i18n = {
     msgDelRfid: "🗑️ Đã gửi lệnh xoá thẻ RFID #",
     msgSavedOilConfig: "🛢️ Đã lưu định mức thay dầu!",
     msgSavedMaint: "🛠️ Đã cập nhật lịch bảo dưỡng!",
-    msgSavedOdo: "🚗 Đã cập nhật số KM Odometer!",
-    findMelodyTitle: "Cài đặt còi tìm xe",
-    findMelodyDesc: "Chọn 1 trong 10 chế độ còi hú",
-    findRepeatDesc: "Số lần lặp lại (5 - 50 lần)",
-    btnSaveMelody: "Lưu cài đặt còi tìm xe",
-    msgSavedMelody: "🔔 Đã lưu cài đặt còi tìm xe!"
+    msgSavedOdo: "🚗 Đã cập nhật số KM Odometer!"
   },
   eng: {
     alertLabel: "System Alert",
@@ -768,12 +762,7 @@ const i18n = {
     msgDelRfid: "🗑️ Deleted RFID card #",
     msgSavedOilConfig: "🛢️ Oil thresholds saved!",
     msgSavedMaint: "🛠️ Maintenance log updated!",
-    msgSavedOdo: "🚗 Odometer updated!",
-    findMelodyTitle: "Find Vehicle Melody Settings",
-    findMelodyDesc: "Select buzzer melody pattern",
-    findRepeatDesc: "Repeat times (5 - 50 times)",
-    btnSaveMelody: "Save Melody Settings",
-    msgSavedMelody: "🔔 Melody settings saved!"
+    msgSavedOdo: "🚗 Odometer updated!"
   }
 };
 
@@ -851,6 +840,96 @@ function toggleModal(show) {
   document.getElementById('settingsModal').classList.toggle('active', show);
 }
 
+// ================== BLE LAYER (thay cho fetch/WiFi) ==================
+Object.assign(i18n.vi, {
+  standStatus: "Chân chống",
+  bleDiagLabel: "Bluetooth",
+  standUp: "Đã gạt lên",
+  standDown: "ĐANG HẠ",
+  bleOk: "Đã kết nối",
+  wifiTitle: "Cài đặt Bluetooth",
+  bleNameDesc: "Tên Bluetooth (tối đa 12 ký tự)",
+  btnSaveBleName: "Lưu tên & Khởi động lại",
+  pinDesc: "Đổi PIN (4-8 chữ số)",
+  btnSavePin: "Lưu PIN mới",
+  btnDisconnect: "Ngắt kết nối",
+  connTitle: "Kết nối xe",
+  connHint: "Bật Bluetooth, đứng gần xe, nhập PIN rồi bấm Kết nối.",
+  btnConnect: "🔵 KẾT NỐI BLUETOOTH",
+  sleepTitle: "Tự động ngủ nông",
+  sleepDesc: "Vào chế độ ngủ sau (giây) khi khoá xe và không dùng. 0 = tắt.",
+  sleepModeEco: "Tiết kiệm (vẫn phát Bluetooth)",
+  sleepModeDeep: "Ngủ hẳn (chạm vân tay để đánh thức)",
+  btnSaveSleep: "Lưu thời gian ngủ",
+  holdTitle: "Thời gian giữ vân tay để đề",
+  holdDesc: "Giữ vân tay lâu hơn số ms này thì đề. Chạm ngắn hơn chỉ tính là chạm để khoá (3 lần chạm = khoá xe), không bao giờ đề. Từ 400 đến 3000.",
+  btnSaveHold: "Lưu thời gian giữ",
+  findTitle: "Nhịp điệu báo tìm xe",
+  findDesc: "Chỉnh số tiếng bíp (1–10), thời gian mỗi tiếng kêu và thời gian nghỉ giữa hai tiếng (ms). Lưu rồi bấm Thử.",
+  findCountLabel: "Số tiếng bíp",
+  findOnLabel: "Thời gian mỗi tiếng kêu (ms, 50–500)",
+  findOffLabel: "Thời gian nghỉ giữa hai tiếng (ms, 50–1000)",
+  btnSaveFind: "Lưu nhịp báo",
+  btnTestFind: "🔔 Thử nhịp báo",
+  msgSavedFind: "🔔 Đã lưu nhịp báo tìm xe!",
+  msgSavedHold: "👆 Đã lưu thời gian giữ để đề!",
+  msgSavedSleep: "😴 Đã lưu cài đặt ngủ nông!",
+  cancelFp: "Huỷ đăng ký",
+  clearFp: "Xoá tất cả vân tay",
+  fpEmpty: "Chưa có vân tay nào được lưu",
+  fpScanText: "Đang đăng ký vân tay: đã quét thành công ",
+  fpScanHint: "Đặt ngón tay lên cảm biến, nhấc ra khi đèn nháy xanh",
+  msgFpCancel: "Đã huỷ đăng ký vân tay",
+  msgFpClear: "🗑️ Đã gửi lệnh xoá tất cả vân tay",
+  confirmClearFp: "Xoá TẤT CẢ vân tay đã đăng ký?",
+  btnLedTest: "Thử màu đèn vân tay",
+  msgLedTest: "💡 Đèn vân tay sẽ đổi màu lần lượt (mã 1 → 7), xem Serial Monitor"
+});
+Object.assign(i18n.eng, {
+  standStatus: "Side Stand",
+  bleDiagLabel: "Bluetooth",
+  standUp: "Up",
+  standDown: "DOWN",
+  bleOk: "Connected",
+  wifiTitle: "Bluetooth Settings",
+  bleNameDesc: "Bluetooth name (max 12 chars)",
+  btnSaveBleName: "Save name & Restart",
+  pinDesc: "Change PIN (4-8 digits)",
+  btnSavePin: "Save new PIN",
+  btnDisconnect: "Disconnect",
+  connTitle: "Connect to bike",
+  connHint: "Turn on Bluetooth, stay near the bike, enter PIN and tap Connect.",
+  btnConnect: "🔵 CONNECT BLUETOOTH",
+  sleepTitle: "Auto light sleep",
+  sleepDesc: "Enter sleep after (seconds) when locked and idle. 0 = off.",
+  sleepModeEco: "Eco (Bluetooth stays visible)",
+  sleepModeDeep: "Deep (touch fingerprint to wake)",
+  btnSaveSleep: "Save sleep time",
+  holdTitle: "Fingerprint hold time to start",
+  holdDesc: "Hold the fingerprint longer than this many ms to start the engine. Shorter touches only count as lock taps (3 taps = lock) and never start the engine. Range 400 to 3000.",
+  btnSaveHold: "Save hold time",
+  findTitle: "Find-bike beep rhythm",
+  findDesc: "Set number of beeps (1-10), beep length and gap between beeps (ms). Save, then tap Test.",
+  findCountLabel: "Number of beeps",
+  findOnLabel: "Beep length (ms, 50-500)",
+  findOffLabel: "Gap between beeps (ms, 50-1000)",
+  btnSaveFind: "Save rhythm",
+  btnTestFind: "🔔 Test rhythm",
+  msgSavedFind: "🔔 Find-bike rhythm saved!",
+  msgSavedHold: "👆 Hold time saved!",
+  msgSavedSleep: "😴 Sleep setting saved!",
+  cancelFp: "Cancel enrollment",
+  clearFp: "Delete all fingerprints",
+  fpEmpty: "No fingerprints saved",
+  fpScanText: "Enrolling fingerprint: successful scans ",
+  fpScanHint: "Place finger on the sensor, lift when the LED flashes green",
+  msgFpCancel: "Fingerprint enrollment cancelled",
+  msgFpClear: "🗑️ Delete-all fingerprints command sent",
+  confirmClearFp: "Delete ALL enrolled fingerprints?",
+  btnLedTest: "Test fingerprint LED colors",
+  msgLedTest: "💡 The fingerprint LED will cycle colors (code 1 → 7), check the Serial Monitor"
+});
+
 const SERVICE_UUID = '7a1c0001-5b6e-4c1d-9a3e-2f6d8b4c1e01';
 const CMD_UUID     = '7a1c0002-5b6e-4c1d-9a3e-2f6d8b4c1e01';
 const STATUS_UUID  = '7a1c0003-5b6e-4c1d-9a3e-2f6d8b4c1e01';
@@ -868,6 +947,7 @@ let lastStatus = null, cfg = null;
 let lastStatusMsg = "";
 let fieldsLoaded = false;
 
+// Web Bluetooth chỉ cho 1 thao tác GATT tại một thời điểm -> xếp hàng
 let chain = Promise.resolve();
 function gatt(fn) {
   const r = chain.then(fn);
@@ -917,6 +997,8 @@ async function connectBle() {
   btn.disabled = true;
   try {
     let server = null;
+
+    // Thử nối lại thiết bị đã chọn trước đó (không cần chọn lại)
     if (bleDevice) {
       try {
         setConnMsg(L('Đang kết nối lại...', 'Reconnecting...'));
@@ -1040,6 +1122,7 @@ async function refresh() {
   }
 }
 
+// Gửi 1 lệnh (<= 20 ký tự). Sau đó đọc lại trạng thái + cấu hình.
 async function send(text, toastMsg, quiet) {
   if (!connected) {
     showToast(L('⚠️ Chưa kết nối thiết bị!', '⚠️ Not connected!'));
@@ -1057,6 +1140,19 @@ async function send(text, toastMsg, quiet) {
     showToast(L('⚠️ Lỗi kết nối thiết bị!', '⚠️ Device error!'));
     return false;
   }
+}
+
+// ================== GIAO DIỆN ==================
+function toggleLang() {
+  currentLang = currentLang === 'vi' ? 'eng' : 'vi';
+  localStorage.setItem('lang', currentLang);
+  updateLanguageUI();
+  if (lastStatus) renderStatus(lastStatus);
+  if (cfg) renderConfig(cfg);
+}
+
+function toggleModal(show) {
+  document.getElementById('settingsModal').classList.toggle('active', show);
 }
 
 let alertTimeout = null;
@@ -1116,6 +1212,7 @@ function renderStatus(d) {
 
   document.getElementById('gBleStatus').innerHTML = `<span class="on">${t.bleOk}</span>`;
 
+  // Tiến trình đăng ký vân tay (5 lần quét)
   const fpBox = document.getElementById('fpProgress');
   const fpAddBtn = document.getElementById('addFpBtn');
   if (fpBox) {
@@ -1129,7 +1226,7 @@ function renderStatus(d) {
     } else {
       fpBox.style.display = 'none';
       fpAddBtn.disabled = false;
-      if (fpWasEnrolling) {
+      if (fpWasEnrolling) {      // vừa xong -> nạp lại danh sách vân tay
         fpWasEnrolling = false;
         loadConfig();
       }
@@ -1187,6 +1284,10 @@ function renderConfig(c) {
     document.getElementById('bleNameInput').value = c.name || '';
     document.getElementById('delaySec').value = c.delay || '';
     document.getElementById('starterMs').value = c.starterMs || '';
+    document.getElementById('holdMs').value = c.holdMs || '';
+    document.getElementById('findN').value = c.findN || '';
+    document.getElementById('findOn').value = c.findOn || '';
+    document.getElementById('findOff').value = c.findOff || '';
     document.getElementById('sleepSec').value = (c.sleepSec !== undefined) ? c.sleepSec : '';
     document.getElementById('sleepMode').value = (c.sleepMode === 0) ? '0' : '1';
     document.getElementById('odoKmInput').value = c.odo !== undefined ? c.odo : '';
@@ -1195,16 +1296,11 @@ function renderConfig(c) {
     document.getElementById('oilDate').value = c.oilDate || '';
     document.getElementById('serviceDate').value = c.servDate || '';
     document.getElementById('airFilterDate').value = c.airDate || '';
-    if (c.melody !== undefined) {
-      document.getElementById('findMelodySelect').value = c.melody;
-    }
-    if (c.repTimes !== undefined) {
-      document.getElementById('findRepeatInput').value = c.repTimes;
-    }
     fieldsLoaded = true;
   }
 }
 
+// ================== HÀNH ĐỘNG ==================
 let fpWasEnrolling = false;
 
 function addFingerprint() {
@@ -1228,22 +1324,6 @@ function deleteRfid(specificIndex) {
   const rid = (specificIndex !== undefined) ? specificIndex : document.getElementById('rid').value;
   if (rid === "" || rid === null) return;
   send('delrfid:' + parseInt(rid, 10), i18n[currentLang].msgDelRfid + rid);
-}
-
-function saveFindMelodySettings() {
-  const m = document.getElementById('findMelodySelect').value;
-  const rep = parseInt(document.getElementById('findRepeatInput').value, 10);
-  
-  if (isNaN(rep) || rep < 5 || rep > 50) {
-    showToast(L('⚠️ Số lần lặp phải từ 5 đến 50!', '⚠️ Repeat times must be 5-50!'));
-    return;
-  }
-  
-  send('melody:' + m, null, true).then(success => {
-    if (success) {
-      send('repeat:' + rep, i18n[currentLang].msgSavedMelody);
-    }
-  });
 }
 
 function saveOdo() {
@@ -1297,6 +1377,26 @@ function saveStarterTime() {
   send('starter:' + ms, i18n[currentLang].msgSavedStarter);
 }
 
+function saveFindRhythm() {
+  const n = parseInt(document.getElementById('findN').value, 10);
+  const on = parseInt(document.getElementById('findOn').value, 10);
+  const off = parseInt(document.getElementById('findOff').value, 10);
+  if (isNaN(n) || n < 1 || n > 10 || isNaN(on) || on < 50 || on > 500 || isNaN(off) || off < 50 || off > 1000) {
+    showToast(L('⚠️ Số tiếng 1–10, kêu 50–500 ms, nghỉ 50–1000 ms!', '⚠️ Beeps 1-10, on 50-500 ms, gap 50-1000 ms!'));
+    return;
+  }
+  send('findcfg:' + n + ',' + on + ',' + off, i18n[currentLang].msgSavedFind);
+}
+
+function saveHoldTime() {
+  const ms = parseInt(document.getElementById('holdMs').value, 10);
+  if (isNaN(ms) || ms < 400 || ms > 3000) {
+    showToast(L('⚠️ Thời gian giữ từ 400 đến 3000 ms!', '⚠️ Hold time must be 400-3000 ms!'));
+    return;
+  }
+  send('hold:' + ms, i18n[currentLang].msgSavedHold);
+}
+
 async function saveBleName() {
   const name = document.getElementById('bleNameInput').value.trim();
   if (name.length < 1 || name.length > 12) {
@@ -1305,7 +1405,7 @@ async function saveBleName() {
   }
   const ok = await send('name:' + name, L('🔄 Đã lưu tên, ESP32 đang khởi động lại...', '🔄 Saved, restarting...'), true);
   if (ok) {
-    bleDevice = null;
+    bleDevice = null;   // tên đổi -> phải chọn lại thiết bị
     setTimeout(disconnectBle, 800);
   }
 }
@@ -1321,6 +1421,7 @@ async function savePin() {
   }
 }
 
+// ================== KHỞI TẠO ==================
 try { document.getElementById('pinInput').value = localStorage.getItem('savedPin') || ''; } catch (e) {}
 updateLanguageUI();
 if (!navigator.bluetooth) {
@@ -1328,6 +1429,7 @@ if (!navigator.bluetooth) {
     'Trình duyệt này không hỗ trợ Web Bluetooth. iPhone: mở trang bằng Bluefy. Android: dùng Chrome.',
     'This browser has no Web Bluetooth. iPhone: open in Bluefy. Android: use Chrome.'), true);
 }
+
 </script>
 </body>
 </html>
