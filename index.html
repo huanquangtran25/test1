@@ -487,6 +487,20 @@
       <button class="btn btn-add" data-i18n="btnSaveStarter" onclick="saveStarterTime()">Lưu thời gian đề</button>
     </div>
 
+    <div class="section-title" data-i18n="vcalTitle">Hiệu chuẩn điện áp</div>
+    <div class="wifi-block">
+      <span data-i18n="vcalDesc">Dùng đồng hồ đo điện áp thực tế trên ắc quy, nhập vào ô dưới rồi bấm Hiệu chuẩn. Hệ thống tự tính hệ số.</span>
+      <div style="display:flex; justify-content:space-between; font-size:13px;">
+        <span data-i18n="vcalShown">Đang hiển thị:</span><b id="vcalLive">-- V</b>
+      </div>
+      <div style="display:flex; justify-content:space-between; font-size:13px;">
+        <span data-i18n="vcalFactor">Hệ số hiện tại:</span><b id="vcalFactorTxt">--</b>
+      </div>
+      <input id="vcalActual" type="number" step="0.01" min="5" max="20" placeholder="Điện áp thực tế (V), ví dụ: 12.96">
+      <button class="btn btn-add" data-i18n="btnVcal" onclick="saveVcal()">Hiệu chuẩn điện áp</button>
+      <button class="btn btn-lock" data-i18n="btnVcalReset" onclick="resetVcal()">Đặt lại hiệu chuẩn</button>
+    </div>
+
     <div class="section-title" data-i18n="findTitle">Nhịp điệu báo tìm xe</div>
     <div class="wifi-block">
       <span data-i18n="findPatLabel">Chọn nhịp điệu</span>
@@ -862,6 +876,15 @@ Object.assign(i18n.vi, {
   holdTitle: "Thời gian giữ vân tay để đề",
   holdDesc: "Giữ vân tay lâu hơn số ms này thì đề. Chạm ngắn hơn chỉ tính là chạm để khoá (3 lần chạm = khoá xe), không bao giờ đề. Từ 400 đến 3000.",
   btnSaveHold: "Lưu thời gian giữ",
+  vcalTitle: "Hiệu chuẩn điện áp",
+  vcalDesc: "Dùng đồng hồ đo điện áp thực tế trên ắc quy, nhập vào ô dưới rồi bấm Hiệu chuẩn. Hệ thống tự tính hệ số.",
+  vcalShown: "Đang hiển thị:",
+  vcalFactor: "Hệ số hiện tại:",
+  btnVcal: "Hiệu chuẩn điện áp",
+  btnVcalReset: "Đặt lại hiệu chuẩn",
+  msgSavedVcal: "🔋 Đã gửi lệnh hiệu chuẩn điện áp!",
+  msgResetVcal: "🔋 Đã đặt lại hiệu chuẩn điện áp!",
+  confirmResetVcal: "Đặt lại hiệu chuẩn điện áp về mặc định?",
   findTitle: "Nhịp điệu báo tìm xe",
   findPatLabel: "Chọn nhịp điệu",
   findRepLabel: "Số lần lặp lại (1–10)",
@@ -904,6 +927,15 @@ Object.assign(i18n.eng, {
   holdTitle: "Fingerprint hold time to start",
   holdDesc: "Hold the fingerprint longer than this many ms to start the engine. Shorter touches only count as lock taps (3 taps = lock) and never start the engine. Range 400 to 3000.",
   btnSaveHold: "Save hold time",
+  vcalTitle: "Voltage calibration",
+  vcalDesc: "Measure the real battery voltage with a multimeter, enter it below and tap Calibrate. The factor is computed automatically.",
+  vcalShown: "Currently shown:",
+  vcalFactor: "Current factor:",
+  btnVcal: "Calibrate voltage",
+  btnVcalReset: "Reset calibration",
+  msgSavedVcal: "🔋 Voltage calibration sent!",
+  msgResetVcal: "🔋 Voltage calibration reset!",
+  confirmResetVcal: "Reset voltage calibration to default?",
   findTitle: "Find-bike beep rhythm",
   findPatLabel: "Choose rhythm",
   findRepLabel: "Repeat count (1-10)",
@@ -1192,6 +1224,8 @@ function renderStatus(d) {
   else if (vBatt < 12.2) { vBattElem.className = "value warn"; powerWarnStr = t.powerRecharge; }
   else { vBattElem.className = "value on"; powerWarnStr = t.powerNormal; }
   document.getElementById('gPowerType').innerText = `${t.powerBike} • ${powerWarnStr}`;
+  const vLive = document.getElementById('vcalLive');
+  if (vLive) vLive.innerText = vBatt.toFixed(2) + ' V';
 
   document.getElementById('gStand').innerHTML = d.standDown
     ? `<span class="danger">${t.standDown}</span>` : `<span class="on">${t.standUp}</span>`;
@@ -1274,6 +1308,9 @@ function renderConfig(c) {
       `).join('');
     }
   }
+
+  const vf = document.getElementById('vcalFactorTxt');
+  if (vf && c.vCal !== undefined) vf.innerText = Number(c.vCal).toFixed(4);
 
   if (!fieldsLoaded) {
     document.getElementById('bleNameInput').value = c.name || '';
@@ -1405,6 +1442,21 @@ async function saveFindRhythm(thenTest) {
   }
   const ok = await send('findcfg:' + pat + ',' + rep, i18n[currentLang].msgSavedFind);
   if (ok && thenTest) triggerFindBike();
+}
+
+function saveVcal() {
+  const v = parseFloat(document.getElementById('vcalActual').value);
+  if (isNaN(v) || v < 5 || v > 20) {
+    showToast(L('⚠️ Nhập điện áp thực tế từ 5 đến 20 V!', '⚠️ Enter the real voltage, 5 to 20 V!'));
+    return;
+  }
+  send('vcal:' + v.toFixed(2), i18n[currentLang].msgSavedVcal);
+  document.getElementById('vcalActual').value = '';
+}
+
+function resetVcal() {
+  if (!confirm(i18n[currentLang].confirmResetVcal)) return;
+  send('vcalreset', i18n[currentLang].msgResetVcal);
 }
 
 function saveHoldTime() {
